@@ -1,0 +1,24 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.30",
+    "socket.io-client": "^4.5.1",
+    "svelte": "^3.44.0",
+    "svelte-fa": "^3.0.2",
+    "vite": "^2.9.9",
+    "postcss": "^8.4.14",
+    "postcss-load-config": "^4.0.1",
+    "svelte-preprocess": "^4.10.7",
+    "autoprefixer": "^10.4.7",
+    "tailwindcss": "^3.1.4"
+  }
+}
