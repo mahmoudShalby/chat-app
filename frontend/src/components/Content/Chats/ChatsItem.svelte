@@ -1,18 +1,22 @@
 <script>
   import { getContext } from 'svelte'
 
-  export let userUsername, username, firstUser, secondUser, messages, searchMode
+  export let userUsername, username, firstUser, secondUser, searchMode, contentMode
 
   const socket = getContext('socket')
 
   let anotherUser
 
-  if (!searchMode)
+  $: if (!searchMode)
     anotherUser = firstUser.username === userUsername ? secondUser:firstUser
 
   const clickHandler = () => {
     if (searchMode) {
       socket.emit('create chat', username)
+      searchMode = false
+    }
+    else {
+      contentMode = 'Chat'
     }
   }
 </script>
@@ -21,6 +25,6 @@
   {#if searchMode}
     {username}
   {:else}
-    {anotherUser.name}
+    {anotherUser.username}
   {/if}
 </div>

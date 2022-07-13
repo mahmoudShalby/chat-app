@@ -14,15 +14,19 @@
   let navbarMode = 'Home'
   let contentMode = 'Chats'
   let searchMode = false
-  let socketId
+  let socketId = ''
   let username = ''
-  let chats = []
-  let userChats = []
+  let chats = writable([])
+  let userChats = writable([])
   let searchValue = writable('')
+  let chat = {
+    anotherUser: { username: '', socketId: '' },
+    messages: []
+  }
 
   setContext('searchValue', searchValue)
 
-  $: if (!searchMode) chats = userChats
+  $: if (!searchMode) chats.set($userChats)
 
   // Setup socket.io connection
   const SERVER_URL = 'http://localhost:5000'
@@ -41,11 +45,12 @@
   socket.on('data', (sentUsername, sentChats, sentSocketId) => {
     if (sentUsername) {
       username = sentUsername
-      userChats = chats = sentChats
+      userChats.set(sentChats)
+      chats.set(sentChats)
       socketId = sentSocketId
       isLoginded = true
       console.log('\x1b[36musername:', username)
-      console.log('\x1b[36mchats:', chats)
+      console.log('\x1b[36mchats:', $chats)
       console.log('\x1b[36msocketId:', socketId)
     }
     isLoading = false
@@ -53,11 +58,14 @@
 
   socket.on('set auth token', token => {
     localStorage.setItem('token', token)
-    console.log('wating for data...')
     socket.emit('auth token', token)
   })
 
-  socket.on('search result', result => chats = result)
+  socket.on('search result', result => chats.set(result))
+  socket.on('chat created', chat => { 
+    userChats.update(v => [chat, ...v])
+    contentMode = 'Chat'
+  })
 </script>
 
 <div class="text-white h-screen bg-slate-900">
@@ -73,7 +81,7 @@
     {#if isLoginded}
       <div class="h-screen grid grid-rows-[80px_1fr] gap-2" in:fade out:fade={{ duration: 100 }}>
         <Navbar bind:navbarMode bind:contentMode bind:searchMode bind:isLoginded />
-        <Content bind:contentMode bind:chats bind:searchMode bind:username />
+        <Content bind:contentMode bind:chats bind:searchMode bind:username bind:chat />
       </div>
     {:else}
       <Auth />

@@ -30,11 +30,8 @@ io.on('connection', socket => {
   // Authentication
   let username
   socket.on('auth token', async token => {
-    console.log('token:', token)
     if (token) {
       username = verifyJwtToken(token).username
-      console.log('username:', username)
-      console.log('token:', verifyJwtToken(token))
       const user = await User.findOne({ username })
       if (!user) {
         socket.emit('data', null, null, null)
@@ -87,16 +84,25 @@ io.on('connection', socket => {
 
   socket.on('create chat', async anotherUsername => {
     const user = await User.findOne({ username })
-    const anotherUser = await User.findOne({ anotherUsername })
+    const anotherUser = await User.findOne({ username: anotherUsername })
     if (!user || !anotherUser) {
       socket.emit('chat created', null)
       return
     }
-    const chat = await new Chat({ firstUser: user._id, secondUser: anotherUser._id }).populate('secondUser', 'username socketId')
-    console.log(chat)
+    const chat = await new Chat({ firstUser: user._id, secondUser: anotherUser._id }).populate('firstUser secondUser', 'username socketId')
     socket.emit('chat created', chat)
   })
 })
 
 // Serve
-httpServer.listen(5000)
+const serve = (port) => {
+  try {
+    httpServer.listen(port)
+    console.log(`Start serving at port ${port}`)
+  }
+  catch {
+    serve(post + 1)
+  }
+}
+
+serve(5000)
