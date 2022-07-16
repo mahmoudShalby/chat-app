@@ -7,28 +7,38 @@
 
   const socket = getContext('socket')
   let username = '', password = ''
-  let signupAlertInvisible = false
-  let signinAlertInvisible = false
+  let alert = {
+    invisible: false,
+    args: {
+      text: '',
+      bg: ''
+    }
+  }
+  let wrongSignupAlert = {
+    text: 'Exists username',
+    bg: 'red-600'
+  }
+  let wrongSigninAlert = {
+    text: "Username or password isn't right",
+    bg: 'red-600'
+  }
+  let emptyFieldAlert = {
+    text: 'Please fill the fields to continue',
+    bg: 'red-600'
+  }
 
-  socket.on('wrong sign up', () => {
-    signinAlertInvisible = false
-    signupAlertInvisible = true
-  })
+  socket.on('wrong sign up', () => alert = { invisible: true, args: wrongSignupAlert })
+  socket.on('wrong sign in', () => alert = { invisible: true, args: wrongSigninAlert })
 
-  socket.on('wrong sign in', () => {
-    signupAlertInvisible = false
-    signinAlertInvisible = true
-  })
-
-  const submitHandler = type =>
-    socket.emit(type, username, password)
+  const submitHandler = type => {
+    if (username && password)
+      socket.emit(type, username, password)
+    else
+      alert = { invisible: true, args: emptyFieldAlert }
+  }
 </script>
 
-{#if signupAlertInvisible}
-  <Alert text="Exists username" bg="red-600" />
-{:else if signinAlertInvisible}
-  <Alert text="username or password isn't right" bg="red-600" />
-{/if}
+<Alert bind:invisible={alert.invisible} {...alert.args} />
 
 <div class="h-screen grid place-items-center" in:fade out:fade={{ duration: 100 }}>
   <form class="w-full md:w-[350px] max-h-fit bg-slate-800 grid place-items-center py-3">

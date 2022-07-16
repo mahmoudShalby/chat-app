@@ -11,7 +11,6 @@
   let isLoading = true
   let lateLoading = false
   let isLoginded = false
-  let navbarMode = 'Home'
   let contentMode = 'Chats'
   let searchMode = false
   let socketId = ''
@@ -79,8 +78,12 @@
     </span>
   {:else}
     {#if isLoginded}
-      <div class="h-screen grid grid-rows-[80px_1fr] gap-2" in:fade out:fade={{ duration: 100 }}>
-        <Navbar bind:navbarMode bind:contentMode bind:searchMode bind:isLoginded />
+      <div
+        class={`h-screen grid transition ${searchMode ? 'grid-rows-[60px_1fr]':'grid-rows-[80px_1fr]'} gap-2`}
+        in:fade
+        out:fade={{ duration: 100 }}
+      >
+        <Navbar bind:contentMode bind:searchMode bind:isLoginded />
         <Content bind:contentMode bind:chats bind:searchMode bind:username bind:chat />
       </div>
     {:else}
